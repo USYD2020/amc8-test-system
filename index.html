@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMC8 班前测试系统</title>
+    
+    <!-- 外部资源 -->
+    <link href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-bg: #1f2937;
+            --dark-card: #374151;
+        }
+
+        * {
+            font-family: 'Noto Sans SC', Tahoma, Arial, Roboto, "Droid Sans", "Helvetica Neue", "Droid Sans Fallback", "Heiti SC", "Hiragino Sans GB", Simsun, sans-serif;
+        }
+
+        body {
+            transition: all 0.3s ease;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+        }
+
+        /* 深色模式样式 */
+        .dark {
+            background-color: var(--dark-bg);
+            color: #f9fafb;
+        }
+
+        .dark .bg-white {
+            background-color: var(--dark-card) !important;
+        }
+
+        .dark .text-gray-900 {
+            color: #f9fafb !important;
+        }
+
+        .dark .text-gray-600 {
+            color: #9ca3af !important;
+        }
+
+        .dark .border-gray-200 {
+            border-color: #4b5563 !important;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .animate-delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .animate-delay-400 {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calculator text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">AMC8 班前测试系统</h1>
+                        <p class="text-sm text-gray-500">魔渊国际数学能力评估</p>
+                    </div>
+                </div>
+                
+                <!-- 深色模式切换 -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-moon text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Hero 区域 -->
+        <div class="hero-gradient rounded-3xl p-8 md:p-12 text-white mb-12 animate-fade-in-up">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-6">
+                    <i class="fas fa-graduation-cap text-2xl"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">AMC8 班前能力测试</h1>
+                <p class="text-xl md:text-2xl mb-6 text-blue-100">专业数学竞赛水平评估，精准班型推荐</p>
+                <div class="flex flex-wrap justify-center gap-6 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-clock"></i>
+                        <span>75分钟限时</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-list-ol"></i>
+                        <span>25道题目</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-trophy"></i>
+                        <span>智能评分</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试说明卡片 -->
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <!-- 测试规则 -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-fade-in-up animate-delay-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">测试规则</h3>
+                </div>
+                <ul class="space-y-3 text-gray-600">
+                    <li class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1 text-sm"></i>
+                        <span>总计25道选择题，每题1分，满分25分</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1 text-sm"></i>
+                        <span>答对得1分，答错或不答得0分</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1 text-sm"></i>
+                        <span>考试时间75分钟，时间到自动提交</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1 text-sm"></i>
+                        <span>支持随时保存答案，防止意外丢失</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 班型介绍 -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-fade-in-up animate-delay-400">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-layer-group text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">班型推荐</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                        <span class="font-medium text-red-700">基础班 准备 1 年</span>
+                        <span class="text-sm text-red-600">1-4题</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                        <span class="font-medium text-orange-700">潜力班 准备 1 年</span>
+                        <span class="text-sm text-gray-900">5-7题</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span class="font-medium text-blue-700">强化班</span>
+                        <span class="text-sm text-blue-600">8-10题</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <span class="font-medium text-purple-700">强化班+</span>
+                        <span class="text-sm text-purple-600">11-13题</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <span class="font-medium text-green-700">建议引导 AMC10 + 强化班(专注冲刺)</span>
+                        <span class="text-sm text-green-600">14题以上</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户信息表单 -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">开始你的AMC8之旅</h2>
+            
+            <!-- 测试模式切换 (开发者专用，默认隐藏) -->
+            <div id="test-mode-toggle-container" class="flex justify-center mb-6" style="display: none;">
+                <button type="button" id="test-mode-toggle" 
+                        class="px-4 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg transition-all border-2 border-yellow-300">
+                    <i class="fas fa-flask mr-2"></i>🧪 开发者测试模式
+                </button>
+            </div>
+            
+            <form id="start-test-form" class="space-y-6">
+                <div>
+                    <label for="student-name" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2"></i>学生姓名
+                    </label>
+                    <input type="text" 
+                           id="student-name" 
+                           required
+                           placeholder="请输入学生姓名"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <div>
+                    <label for="student-phone" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-phone mr-2"></i>联系电话
+                    </label>
+                    <input type="tel" 
+                           id="student-phone"
+                           required
+                           placeholder="请输入联系电话"
+                           pattern="[0-9]{11}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <div>
+                    <label for="student-grade" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-graduation-cap mr-2"></i>年级
+                    </label>
+                    <select id="student-grade" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="">请选择年级</option>
+                        <option value="3年级以下">3年级以下</option>
+                        <option value="3">3年级</option>
+                        <option value="4">4年级</option>
+                        <option value="5">5年级</option>
+                        <option value="6">6年级</option>
+                        <option value="7">7年级</option>
+                        <option value="8">8年级</option>
+                        <option value="8年级以上">8年级以上</option>
+                    </select>
+                </div>
+
+                <!-- 确认条款 -->
+                <div class="flex items-start space-x-3">
+                    <input type="checkbox" 
+                           id="agree-terms" 
+                           required
+                           class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <label for="agree-terms" class="text-sm text-gray-600">
+                        我已阅读并同意测试规则，了解本次测试为学术评估目的，确保独立完成测试
+                    </label>
+                </div>
+
+                <!-- 开始按钮 -->
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold text-lg btn-primary">
+                    <i class="fas fa-play mr-2"></i>开始测试
+                </button>
+            </form>
+
+            <!-- 测试模式表单 (默认隐藏) -->
+            <form id="test-mode-form" class="space-y-6" style="display: none;">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-flask text-yellow-600 mr-2"></i>
+                        <span class="text-yellow-800 font-medium">测试模式已启用</span>
+                    </div>
+                    <p class="text-sm text-yellow-700 mt-1">在此模式下可以输入模拟用户信息和随机答案来测试系统功能</p>
+                </div>
+
+                <!-- 测试用户信息 -->
+                <div>
+                    <label for="test-student-name" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2"></i>测试学生姓名
+                    </label>
+                    <input type="text" 
+                           id="test-student-name" 
+                           value="张三测试"
+                           placeholder="请输入测试学生姓名"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <div>
+                    <label for="test-student-phone" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-phone mr-2"></i>测试联系电话
+                    </label>
+                    <input type="tel" 
+                           id="test-student-phone"
+                           value="13800138000"
+                           placeholder="请输入测试联系电话"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <div>
+                    <label for="test-student-grade" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-graduation-cap mr-2"></i>测试年级
+                    </label>
+                    <select id="test-student-grade" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="4" selected>4年级</option>
+                        <option value="3年级以下">3年级以下</option>
+                        <option value="3">3年级</option>
+                        <option value="5">5年级</option>
+                        <option value="6">6年级</option>
+                        <option value="7">7年级</option>
+                        <option value="8">8年级</option>
+                        <option value="8年级以上">8年级以上</option>
+                    </select>
+                </div>
+
+                <!-- 答案生成选项 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="font-medium text-blue-900 mb-3">
+                        <i class="fas fa-magic mr-2"></i>答案生成设置
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="answer-mode" class="block text-sm font-medium text-gray-700 mb-2">答案模式</label>
+                            <select id="answer-mode" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="random">随机答案</option>
+                                <option value="mostly-correct">大部分正确 (80%)</option>
+                                <option value="mostly-wrong">大部分错误 (20%)</option>
+                                <option value="all-correct">全部正确</option>
+                                <option value="all-wrong">全部错误</option>
+                                <option value="no-answers">全部不答 (测试0答案场景)</option>
+                                <option value="pattern">有规律的答案 (A-B-C-D-E循环)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="answer-count" class="block text-sm font-medium text-gray-700 mb-2">答题数量</label>
+                            <select id="answer-count" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="25">完整答题 (25题)</option>
+                                <option value="20">大部分答题 (20题)</option>
+                                <option value="15">部分答题 (15题)</option>
+                                <option value="10">少量答题 (10题)</option>
+                                <option value="5">极少答题 (5题)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 开始测试按钮 -->
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:from-yellow-600 hover:to-orange-600 transition-all">
+                    <i class="fas fa-flask mr-2"></i>开始测试模式
+                </button>
+            </form>
+        </div>
+
+        <!-- 特色功能 -->
+        <div class="mt-16">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">系统特色</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">智能分析</h3>
+                    <p class="text-gray-600 text-sm">AI驱动的能力分析，精准识别数学强弱项</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">详细报告</h3>
+                    <p class="text-gray-600 text-sm">全方位成绩分析报告，可视化能力雷达图</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-download text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">结果导出</h3>
+                    <p class="text-gray-600 text-sm">支持PDF导出，永久保存测试结果</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-calculator text-white text-sm"></i>
+                </div>
+                <span class="font-semibold">AMC8 班前测试系统</span>
+            </div>
+            <p class="text-gray-400 mb-2">© 2025 魔渊国际教育. 专业数学竞赛培训.</p>
+            <p class="text-gray-500 text-sm">本系统仅用于教学评估目的</p>
+        </div>
+    </footer>
+
+    <!-- Supabase Database Operations -->
+    <script src="assets/js/supabase-client.js"></script>
+    
+    <script>
+        // 深色模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        // 检查本地存储的主题设置
+        const currentTheme = localStorage.getItem('theme') || 
+                           (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        if (currentTheme === 'dark') {
+            body.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            
+            if (body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            }
+        });
+
+        // 表单提交处理
+        document.getElementById('start-test-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 确保这是正常表单提交，不是测试模式
+            if (testModeActivated || isTestMode || window.testModeActive) {
+                console.log('阻止了测试模式下的正常表单提交');
+                return;
+            }
+            
+            // 强制确保我们使用正常表单的值
+            console.log('正常表单提交开始...');
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>处理中...';
+            
+            // 完全清除任何测试模式数据（防止意外覆盖）
+            const testKeys = ['amc8_test_mode', 'amc8_test_completed', 'amc8_test_answers', 'amc8_test_time'];
+            testKeys.forEach(key => localStorage.removeItem(key));
+            
+            // 临时禁用测试模式激活
+            window.testModeDisabled = true;
+            
+            console.log('已清除所有测试模式数据，开始正常表单提交');
+            
+            // 检查是否跳过数据库操作（本地测试模式）
+            const skipDatabase = window.location.search.includes('local=true') || window.location.hostname === 'localhost';
+            
+            const studentName = document.getElementById('student-name').value.trim();
+            const studentPhone = document.getElementById('student-phone').value.trim();
+            const studentGrade = document.getElementById('student-grade').value;
+            
+            // Debug: 输出用户输入信息
+            console.log('用户输入信息:', { name: studentName, phone: studentPhone, grade: studentGrade });
+            
+            // 验证表单
+            if (!studentName || !studentPhone || !studentGrade) {
+                alert('请填写完整信息');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                return;
+            }
+
+            // 验证手机号格式
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(studentPhone)) {
+                alert('请输入正确的手机号格式');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                return;
+            }
+
+            // 检查是否为特殊测试手机号（可无限测试）
+            const isSpecialPhone = studentPhone === '15271226757';
+            
+            // 如果不是特殊手机号，需要检查是否已完成测试
+            if (!isSpecialPhone && window.DatabaseOperations && window.supabaseClient && !skipDatabase) {
+                try {
+                    console.log('检查手机号测试状态...');
+                    
+                    // 添加超时包装函数
+                    const withTimeout = (promise, seconds = 3) => {
+                        return Promise.race([
+                            promise,
+                            new Promise((_, reject) => 
+                                setTimeout(() => reject(new Error(`检查超时 (${seconds}秒)`)), seconds * 1000)
+                            )
+                        ]);
+                    };
+                    
+                    const testStatus = await withTimeout(DatabaseOperations.getUserTestStatus(studentPhone));
+                    
+                    if (testStatus && testStatus.has_completed_test) {
+                        alert('该手机号已完成测试！每个手机号只能测试一次。\n如需查看成绩，请联系管理员。');
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalText;
+                        return;
+                    }
+                } catch (error) {
+                    console.log('无法检查测试状态，允许继续:', error.message);
+                    // 如果检查失败，允许继续（避免阻塞用户）
+                }
+            }
+            
+            // 保存用户信息并跳转
+            const userInfo = {
+                name: studentName,
+                phone: studentPhone,
+                grade: studentGrade,
+                testStartTime: new Date().toISOString(),
+                isSpecialPhone: isSpecialPhone
+            };
+            
+            localStorage.setItem('amc8_user_info', JSON.stringify(userInfo));
+            localStorage.removeItem('amc8_test_answers');
+            localStorage.removeItem('amc8_test_time');
+            // 确保清除所有测试模式标记
+            testKeys.forEach(key => localStorage.removeItem(key));
+            
+            console.log(isSpecialPhone ? '特殊手机号 - 允许无限测试:' : '正常模式 - 保存用户信息:', userInfo);
+            
+            // 跳转到测试页面
+            window.location.href = 'test.html';
+            
+            // 后台数据库操作（仅为非特殊手机号创建用户和会话）
+            if (!isSpecialPhone && window.DatabaseOperations && window.supabaseClient && !skipDatabase) {
+                (async () => {
+                    try {
+                        console.log('后台执行用户创建和会话管理...');
+                        
+                        // 创建或获取用户
+                        const userResult = await DatabaseOperations.createOrGetUser(studentName, studentPhone, studentGrade);
+                        
+                        if (userResult.success) {
+                            // 更新localStorage中的用户ID
+                            const existingUserInfo = JSON.parse(localStorage.getItem('amc8_user_info') || '{}');
+                            existingUserInfo.id = userResult.user.id;
+                            localStorage.setItem('amc8_user_info', JSON.stringify(existingUserInfo));
+                            
+                            // 创建会话
+                            const sessionResult = await DatabaseOperations.getOrResumeSession(userResult.user.id);
+                            if (sessionResult.success) {
+                                localStorage.setItem('amc8_session_id', sessionResult.session.id);
+                                console.log('后台数据库操作完成');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('后台数据库操作失败:', error);
+                    }
+                })();
+            }
+        });
+
+        // 开发者测试模式功能
+        let isTestMode = false;
+        let testModeActivated = false;
+        const testModeToggle = document.getElementById('test-mode-toggle');
+        const testModeContainer = document.getElementById('test-mode-toggle-container');
+        const normalForm = document.getElementById('start-test-form');
+        const testModeForm = document.getElementById('test-mode-form');
+
+        // 开发者模式激活函数
+        function enableTestMode() {
+            if (window.testModeDisabled) {
+                console.log('测试模式已被禁用，无法激活');
+                return;
+            }
+            if (!testModeActivated) {
+                testModeActivated = true;
+                testModeContainer.style.display = 'flex';
+                
+                // 显示开发者模式横幅
+                showDeveloperModeBanner();
+                
+                console.log('🧪 开发者测试模式已激活');
+                console.log('激活方式说明:');
+                console.log('1. 键盘快捷键: Ctrl+Shift+T (Windows/Linux) 或 Cmd+Shift+T (Mac)');
+                console.log('2. URL参数: 在网址后添加 ?testmode=true');
+                console.log('3. 控制台命令: enableTestMode()');
+                console.log('4. 隐藏触发: 快速点击页面标题5次');
+            }
+        }
+
+        // 全局暴露激活函数供控制台使用
+        window.enableTestMode = enableTestMode;
+        
+        // 全局清理函数供调试使用
+        window.clearAllAMC8Data = function() {
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('amc8_'));
+            keys.forEach(key => localStorage.removeItem(key));
+            console.log('已清除所有AMC8相关数据:', keys);
+            window.testModeDisabled = false;
+            window.location.reload();
+        };
+
+        // 1. 键盘快捷键激活 (Ctrl+Shift+T 或 Cmd+Shift+T)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                enableTestMode();
+            }
+        });
+
+        // 2. URL参数检测
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('testmode') === 'true' && !window.testModeDisabled) {
+            enableTestMode();
+        }
+
+        // 3. 隐藏点击激活 (连续点击标题5次)
+        let titleClickCount = 0;
+        let titleClickTimer = null;
+        const titleElement = document.querySelector('h2');
+        
+        if (titleElement) {
+            titleElement.addEventListener('click', function() {
+                titleClickCount++;
+                
+                if (titleClickCount === 1) {
+                    titleClickTimer = setTimeout(() => {
+                        titleClickCount = 0;
+                    }, 3000); // 3秒内完成5次点击
+                }
+                
+                if (titleClickCount >= 5) {
+                    clearTimeout(titleClickTimer);
+                    titleClickCount = 0;
+                    enableTestMode();
+                }
+            });
+        }
+
+        // 显示开发者模式横幅
+        function showDeveloperModeBanner() {
+            const banner = document.createElement('div');
+            banner.id = 'developer-mode-banner';
+            banner.className = 'fixed top-0 left-0 right-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-center py-2 px-4 z-50 shadow-lg';
+            banner.innerHTML = `
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-code text-lg"></i>
+                    <span class="font-bold">🧪 开发者测试模式已激活</span>
+                    <i class="fas fa-flask text-lg"></i>
+                    <button onclick="disableDeveloperMode()" class="ml-4 bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-all">
+                        关闭
+                    </button>
+                </div>
+            `;
+            
+            document.body.insertBefore(banner, document.body.firstChild);
+            
+            // 为页面添加顶部padding以避免内容被横幅遮挡
+            document.body.style.paddingTop = '50px';
+        }
+
+        // 关闭开发者模式
+        window.disableDeveloperMode = function() {
+            testModeActivated = false;
+            isTestMode = false;
+            testModeContainer.style.display = 'none';
+            normalForm.style.display = 'block';
+            testModeForm.style.display = 'none';
+            
+            // 移除横幅
+            const banner = document.getElementById('developer-mode-banner');
+            if (banner) {
+                banner.remove();
+                document.body.style.paddingTop = '';
+            }
+            
+            // 重置按钮状态
+            testModeToggle.innerHTML = '<i class="fas fa-flask mr-2"></i>🧪 开发者测试模式';
+            testModeToggle.className = 'px-4 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg transition-all border-2 border-yellow-300';
+            
+            console.log('🔒 开发者测试模式已关闭');
+        };
+
+        // 测试模式表单切换逻辑
+        testModeToggle.addEventListener('click', function() {
+            if (!testModeActivated) return; // 未激活开发者模式时不允许使用
+            
+            isTestMode = !isTestMode;
+            window.testModeActive = isTestMode;  // 全局标记
+            
+            if (isTestMode) {
+                normalForm.style.display = 'none';
+                testModeForm.style.display = 'block';
+                testModeToggle.innerHTML = '<i class="fas fa-times mr-2"></i>关闭测试表单';
+                testModeToggle.className = 'px-4 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-all border-2 border-red-300';
+                console.log('测试模式表单已激活');
+            } else {
+                normalForm.style.display = 'block';
+                testModeForm.style.display = 'none';
+                testModeToggle.innerHTML = '<i class="fas fa-flask mr-2"></i>🧪 开发者测试模式';
+                testModeToggle.className = 'px-4 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg transition-all border-2 border-yellow-300';
+                console.log('测试模式表单已关闭');
+            }
+        });
+
+        // 测试模式表单提交处理
+        testModeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 确保测试模式已激活且可见
+            if (!testModeActivated || testModeForm.style.display === 'none' || window.testModeDisabled) {
+                console.log('阻止了无效的测试模式表单提交');
+                return;
+            }
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>生成测试数据...';
+            
+            // 获取测试用户信息
+            const testName = document.getElementById('test-student-name').value.trim();
+            const testPhone = document.getElementById('test-student-phone').value.trim();
+            const testGrade = document.getElementById('test-student-grade').value;
+            const answerMode = document.getElementById('answer-mode').value;
+            const answerCount = parseInt(document.getElementById('answer-count').value);
+            
+            // 生成随机答案
+            const testAnswers = generateTestAnswers(answerMode, answerCount);
+            
+            // 保存测试用户信息
+            const userInfo = {
+                name: testName,
+                phone: testPhone,
+                grade: testGrade,
+                testStartTime: new Date().toISOString(),
+                isTestMode: true,
+                answerMode: answerMode,
+                answerCount: answerCount
+            };
+            
+            localStorage.setItem('amc8_user_info', JSON.stringify(userInfo));
+            localStorage.setItem('amc8_test_answers', JSON.stringify(testAnswers));
+            localStorage.setItem('amc8_test_mode', 'true');
+            
+            // 模拟测试完成时间 (立即完成)
+            localStorage.setItem('amc8_test_completed', 'true');
+            
+            setTimeout(() => {
+                // 直接跳转到结果页面
+                window.location.href = 'result.html';
+            }, 1000);
+        });
+
+        // 生成测试答案的函数
+        function generateTestAnswers(mode, count) {
+            const answers = {};
+            const options = ['A', 'B', 'C', 'D', 'E'];
+            
+            // 预设的正确答案 (基于实际题目)
+            const correctAnswers = {
+                1: 'E', 2: 'C', 3: 'D', 4: 'B', 5: 'A',
+                6: 'E', 7: 'C', 8: 'D', 9: 'B', 10: 'A',
+                11: 'C', 12: 'A', 13: 'E', 14: 'D', 15: 'C',
+                16: 'B', 17: 'A', 18: 'E', 19: 'D', 20: 'C',
+                21: 'B', 22: 'A', 23: 'E', 24: 'D', 25: 'C'
+            };
+            
+            for (let i = 1; i <= count; i++) {
+                let answer;
+                
+                switch (mode) {
+                    case 'random':
+                        answer = options[Math.floor(Math.random() * options.length)];
+                        break;
+                    case 'mostly-correct':
+                        // 80% 正确率
+                        answer = Math.random() < 0.8 ? correctAnswers[i] : options[Math.floor(Math.random() * options.length)];
+                        break;
+                    case 'mostly-wrong':
+                        // 20% 正确率
+                        answer = Math.random() < 0.2 ? correctAnswers[i] : options[Math.floor(Math.random() * options.length)];
+                        break;
+                    case 'all-correct':
+                        answer = correctAnswers[i];
+                        break;
+                    case 'all-wrong':
+                        // 确保选择错误答案
+                        do {
+                            answer = options[Math.floor(Math.random() * options.length)];
+                        } while (answer === correctAnswers[i]);
+                        break;
+                    case 'pattern':
+                        // A-B-C-D-E 循环
+                        answer = options[(i - 1) % options.length];
+                        break;
+                    case 'no-answers':
+                        // 不添加任何答案，直接跳过
+                        continue;
+                    default:
+                        answer = options[Math.floor(Math.random() * options.length)];
+                }
+                
+                answers[i] = answer;
+            }
+            
+            return answers;
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+            animatedElements.forEach((element, index) => {
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

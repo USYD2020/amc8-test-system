@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMC8测试 - 题目与答案解析</title>
+    
+    <!-- 外部资源 -->
+    <link href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax配置 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                ready() {
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    
+    <style>
+        * {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* 标题卡片 */
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 题目头部 */
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .question-number {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question-number-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .question-subject {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* 题目内容 */
+        .question-content {
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .question-text.chinese {
+            color: #1f2937;
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-text.english {
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-style: italic;
+            padding: 1rem;
+            background: #f9fafb;
+            border-left: 3px solid #d1d5db;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 选项 */
+        .question-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            flex: 0 0 auto;
+        }
+
+        .option-item:hover {
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+
+        .option-item.correct {
+            background: linear-gradient(to right, #d1fae5, #ecfdf5);
+            border-color: #10b981;
+        }
+
+        .option-item.incorrect {
+            background: linear-gradient(to right, #fee2e2, #fef2f2);
+            border-color: #ef4444;
+        }
+
+        .option-item.user-selected {
+            position: relative;
+            border-left: 4px solid #6366f1;
+            background-color: rgba(99, 102, 241, 0.08);
+            padding-right: 3rem; /* Add right padding to prevent overlap */
+        }
+
+        .option-item.user-selected::before {
+            content: '👉';
+            position: absolute;
+            left: -2px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #6366f1;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .option-item.user-selected::after {
+            content: '你的答案';
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            background: #6366f1;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        /* 优先级修复：当选项既是用户答案又是错误答案时，保持红色边框 */
+        .option-item.user-selected.incorrect {
+            border-left: 4px solid #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.08) !important;
+        }
+
+        .option-item.user-selected.incorrect::before {
+            background: #ef4444 !important;
+        }
+
+        .option-item.user-selected.incorrect::after {
+            background: #ef4444 !important;
+        }
+
+        .option-label {
+            font-weight: bold;
+            margin-right: 1rem;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border-radius: 50%;
+        }
+
+        .option-item.correct .option-label {
+            background: #10b981;
+            color: white;
+        }
+
+        .option-item.incorrect.user-selected .option-label {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* 答案分析 */
+        .answer-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .answer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .answer-status.correct {
+            color: #059669;
+        }
+
+        .answer-status.incorrect {
+            color: #dc2626;
+        }
+
+        .answer-status.unanswered {
+            color: #6b7280;
+        }
+
+        .answer-details {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .answer-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .answer-value {
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #d1d5db;
+        }
+
+        .answer-value.correct {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .answer-value.incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        /* 统计信息 */
+        .stats-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* 打印样式 */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .question-card {
+                page-break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb;
+            }
+
+            .navbar {
+                display: none !important;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <button onclick="goBack()" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">题目与答案解析</h1>
+                        <p class="text-sm text-gray-600" id="user-info">正在加载...</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="goBack()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        返回成绩单
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 标题卡片 -->
+        <div class="header-card">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">
+                AMC8班前测试 - 完整题目与答案解析
+            </h1>
+            <p class="text-center text-gray-600">
+                查看所有题目内容，对比你的答案与正确答案
+            </p>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-questions">25</div>
+                    <div class="stat-label">总题数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value text-green-600" id="correct-count">0</div>
+                    <div class="stat-label">正确</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value text-red-600" id="wrong-count">0</div>
+                    <div class="stat-label">错误</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value text-gray-600" id="unanswered-count">0</div>
+                    <div class="stat-label">未答</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value text-blue-600" id="score">0</div>
+                    <div class="stat-label">得分</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 题目列表容器 -->
+        <div id="questions-container">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 引入JavaScript文件 -->
+    <script src="js/test-engine.js"></script>
+    <script src="js/scoring-engine.js"></script>
+    
+    <script>
+        // 全局变量
+        let userAnswers = {};
+        let userInfo = {};
+        let correctCount = 0;
+        let wrongCount = 0;
+        let unansweredCount = 0;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 获取用户信息和答案
+            userInfo = JSON.parse(localStorage.getItem('amc8_user_info') || '{}');
+            userAnswers = JSON.parse(localStorage.getItem('amc8_test_answers') || '{}');
+            
+            // 显示用户信息
+            if (userInfo.name) {
+                document.getElementById('user-info').textContent = 
+                    `${userInfo.name} | ${userInfo.grade || ''}年级`;
+            }
+            
+            // 生成题目内容
+            generateQuestionsContent();
+        });
+
+        // 生成题目内容
+        function generateQuestionsContent() {
+            const container = document.getElementById('questions-container');
+            
+            // 检查题目数据
+            if (typeof QUESTIONS_DATA === 'undefined' || !QUESTIONS_DATA.length) {
+                container.innerHTML = `
+                    <div class="text-center text-red-600 p-8">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>无法加载题目数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 重置计数
+            correctCount = 0;
+            wrongCount = 0;
+            unansweredCount = 0;
+            
+            // 生成每道题目
+            QUESTIONS_DATA.forEach((question, index) => {
+                const questionNumber = index + 1;
+                const userAnswer = userAnswers[questionNumber] || userAnswers[questionNumber.toString()] || '';
+                const correctAnswer = question.correct_answer || '';
+                const isAnswered = userAnswer !== '';
+                const isCorrect = isAnswered && userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                
+                // 更新统计
+                if (!isAnswered) {
+                    unansweredCount++;
+                } else if (isCorrect) {
+                    correctCount++;
+                } else {
+                    wrongCount++;
+                }
+                
+                // 创建题目卡片
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">
+                            <span class="question-number-badge">第 ${questionNumber} 题</span>
+                        </div>
+                        <div class="question-subject">${question.subject || '数学'}</div>
+                    </div>
+                    
+                    <div class="question-content">
+                        <!-- 英文题目 -->
+                        <div class="question-text english">
+                            ${question.content_en || ''}
+                        </div>
+                        
+                        <!-- 中文题目 -->
+                        <div class="question-text chinese">
+                            ${question.content_zh || ''}
+                        </div>
+                        
+                        <!-- 选项 -->
+                        <div class="question-options">
+                            ${question.options ? question.options.map(option => {
+                                const isUserAnswer = userAnswer === option.label;
+                                const isCorrectOption = correctAnswer === option.label;
+                                let className = 'option-item';
+                                
+                                if (isCorrectOption) {
+                                    className += ' correct';
+                                }
+                                if (isUserAnswer && !isCorrectOption) {
+                                    className += ' incorrect user-selected';
+                                } else if (isUserAnswer && isCorrectOption) {
+                                    className += ' user-selected';
+                                }
+                                
+                                return `
+                                    <div class="${className}">
+                                        <span class="option-label">${option.label}</span>
+                                        <span>${option.text}</span>
+                                    </div>
+                                `;
+                            }).join('') : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- 答案分析 - 紧凑版 -->
+                    <div class="answer-section">
+                        <div class="answer-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.9rem;">
+                                <span>
+                                    <span style="color: #6b7280;">你的答案:</span>
+                                    <span class="${isAnswered ? (isCorrect ? 'answer-value correct' : 'answer-value incorrect') : 'answer-value'}" style="margin-left: 0.25rem;">
+                                        ${isAnswered ? userAnswer : '-'}
+                                    </span>
+                                    ${isCorrect ? '<span style="color: #059669; margin-left: 0.25rem;">✓</span>' : 
+                                      isAnswered ? '<span style="color: #dc2626; margin-left: 0.25rem;">✗</span>' : ''}
+                                </span>
+                                <span style="color: #d1d5db;">|</span>
+                                <span>
+                                    <span style="color: #6b7280;">正确答案:</span>
+                                    <span class="answer-value correct" style="margin-left: 0.25rem;">${correctAnswer}</span>
+                                </span>
+                            </div>
+                            <div class="answer-status ${isAnswered ? (isCorrect ? 'correct' : 'incorrect') : 'unanswered'}" style="font-size: 0.85rem;">
+                                ${isCorrect ? '正确' : isAnswered ? '错误' : '未答'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(questionCard);
+            });
+            
+            // 更新统计显示
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+            document.getElementById('unanswered-count').textContent = unansweredCount;
+            document.getElementById('score').textContent = correctCount;
+            
+            // 渲染数学公式
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([container]).catch(err => {
+                    console.error('MathJax渲染失败:', err);
+                });
+            }
+        }
+
+        // 返回成绩单页面
+        function goBack() {
+            window.location.href = 'result.html';
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMC8 测试进行中</title>
+    
+    <!-- 外部资源 -->
+    <link href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- MathJax配置 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                packages: ['base', 'ams', 'newcommand', 'autoload'],
+                macros: {
+                    // 定义自定义宏以处理特殊符号
+                    dollar: '\\$'
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            chtml: {
+                scale: 1,
+                minScale: 0.5,
+                matchFontHeight: false,
+                fontURL: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
+                displayAlign: 'left',
+                displayIndent: '0em'
+            },
+            startup: {
+                ready() {
+                    MathJax.startup.defaultReady();
+                    // 确保数学公式字体大小与普通文字一致
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .MathJax {
+                            font-size: 1em !important;
+                            line-height: 1.5 !important;
+                            font-weight: normal !important;
+                        }
+                        .MathJax_Display {
+                            margin: 0.5em 0 !important;
+                            text-align: left !important;
+                        }
+                        mjx-container {
+                            display: inline-block !important;
+                            margin: 0 !important;
+                        }
+                        mjx-container[display="true"] {
+                            display: block !important;
+                            text-align: center !important;
+                            margin: 1em 0 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-bg: #1f2937;
+            --dark-card: #374151;
+        }
+
+        * {
+            font-family: 'Noto Sans SC', Tahoma, Arial, Roboto, "Droid Sans", "Helvetica Neue", "Droid Sans Fallback", "Heiti SC", "Hiragino Sans GB", Simsun, sans-serif;
+        }
+
+        body {
+            transition: all 0.3s ease;
+        }
+
+        .question-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .question-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .option-button {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+            background: white;
+        }
+
+        .option-button:hover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .option-button.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .timer-warning {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        /* 深色模式 */
+        .dark {
+            background-color: var(--dark-bg);
+            color: #f9fafb;
+        }
+
+        .dark .bg-white {
+            background-color: var(--dark-card) !important;
+        }
+
+        .dark .text-gray-900 {
+            color: #f9fafb !important;
+        }
+
+        .dark .text-gray-600 {
+            color: #9ca3af !important;
+        }
+
+        .dark .border-gray-200 {
+            border-color: #4b5563 !important;
+        }
+
+        .dark .option-button {
+            background-color: var(--dark-card);
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+
+        .dark .option-button:hover {
+            border-color: var(--primary-color);
+            background-color: #1f2937;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            transition: all 0.2s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 问题导航样式 */
+        .question-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .question-nav-btn:hover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .question-nav-btn.current {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .question-nav-btn.answered {
+            border-color: var(--success-color);
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* MathJax数学公式样式统一 */
+        .MathJax, 
+        .MathJax_Display, 
+        .mjx-chtml, 
+        .mjx-math, 
+        .mjx-mrow {
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
+            color: inherit !important;
+        }
+
+        /* 确保题目内容区域的数学公式与文字一致 */
+        #question-content-en .MathJax,
+        #question-content-zh .MathJax {
+            font-size: inherit !important;
+            vertical-align: baseline !important;
+            display: inline !important;
+        }
+
+        /* 内联数学公式样式 */
+        .MathJax[jax="CHTML"][display="true"] {
+            display: block !important;
+            text-align: center !important;
+            margin: 1em 0 !important;
+        }
+
+        .MathJax[jax="CHTML"][display="false"] {
+            display: inline !important;
+            margin: 0 !important;
+        }
+
+        /* 深色模式下的数学公式 */
+        .dark .MathJax,
+        .dark .mjx-chtml {
+            color: #f9fafb !important;
+        }
+
+        /* 题目容器内容字体统一 */
+        #question-content-en, 
+        #question-content-zh {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        #question-content-en * {
+            font-size: 1rem !important;
+            line-height: 1.6 !important;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .question-nav-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calculator text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">AMC8 测试进行中</h1>
+                        <p class="text-sm text-gray-500" id="student-info">学生信息加载中...</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- 计时器 -->
+                    <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-clock text-blue-600"></i>
+                            <span class="font-mono text-lg font-semibold text-blue-700" id="timer-display">75:00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 进度显示 -->
+                    <div class="bg-green-50 px-4 py-2 rounded-lg border border-green-200">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-tasks text-green-600"></i>
+                            <span class="font-semibold text-green-700" id="progress-display">0/25</span>
+                        </div>
+                    </div>
+
+                    <!-- 深色模式切换 -->
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-moon text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid lg:grid-cols-4 gap-8">
+            <!-- 左侧：题目导航 -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">题目导航</h3>
+                    
+                    <!-- 进度条 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span>完成进度</span>
+                            <span id="progress-percent">0%</span>
+                        </div>
+                        <div class="bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 rounded-full h-2 progress-bar" id="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 题目网格 -->
+                    <div class="grid grid-cols-5 gap-2" id="question-nav-grid">
+                        <!-- 题目导航按钮将通过JavaScript生成 -->
+                    </div>
+
+                    <!-- 图例 -->
+                    <div class="mt-6 space-y-2 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-blue-600 rounded"></div>
+                            <span class="text-gray-600">当前题目</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-green-500 rounded"></div>
+                            <span class="text-gray-600">已完成</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-white border-2 border-gray-300 rounded"></div>
+                            <span class="text-gray-600">未完成</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：题目内容 -->
+            <div class="lg:col-span-3">
+                <!-- 题目卡片 -->
+                <div class="bg-white rounded-2xl shadow-lg question-card active" id="question-card">
+                    <div class="p-8">
+                        <!-- 题目头部 -->
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900" id="question-title">第1题</h2>
+                                <div class="flex items-center space-x-4 mt-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium" id="question-subject">代数</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm" id="question-difficulty">简单</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题目内容 -->
+                        <div class="mb-8">
+                            <div class="prose max-w-none">
+                                <!-- 英文题目 -->
+                                <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                                    <p class="text-gray-700 leading-relaxed" id="question-content-en">题目内容加载中...</p>
+                                    <!-- 英文题目图片 -->
+                                    <div id="question-image-en-container" class="mt-4 hidden">
+                                        <img id="question-image-en" src="" alt="Question Image" class="max-w-full h-auto mx-auto rounded-lg shadow-md" style="max-height: 300px;">
+                                    </div>
+                                </div>
+                                
+                                <!-- 中文题目 -->
+                                <div class="p-4 bg-blue-50 rounded-lg">
+                                    <p class="text-gray-800 leading-relaxed" id="question-content-zh">中文题目加载中...</p>
+                                    <!-- 中文题目图片 -->
+                                    <div id="question-image-zh-container" class="mt-4 hidden">
+                                        <img id="question-image-zh" src="" alt="题目图片" class="max-w-full h-auto mx-auto rounded-lg shadow-md" style="max-height: 300px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 选项 -->
+                        <div class="space-y-3 mb-8" id="options-container">
+                            <!-- 选项将通过JavaScript生成 -->
+                        </div>
+
+                        <!-- 底部导航按钮 -->
+                        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button id="prev-btn" 
+                                    class="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg nav-button" 
+                                    disabled>
+                                <i class="fas fa-chevron-left"></i>
+                                <span>上一题</span>
+                            </button>
+
+                            <div class="flex items-center space-x-4">
+                                <!-- 保存按钮 -->
+                                <button id="save-btn" 
+                                        class="flex items-center space-x-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg nav-button">
+                                    <i class="fas fa-save"></i>
+                                    <span>保存</span>
+                                </button>
+
+                                <!-- 提交/下一题按钮 -->
+                                <button id="next-submit-btn" 
+                                        class="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg nav-button">
+                                    <span id="next-submit-text">下一题</span>
+                                    <i class="fas fa-chevron-right" id="next-submit-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交确认模态框 -->
+    <div id="submit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">确认提交测试</h3>
+                <p class="text-gray-600 mb-6">提交后将无法修改答案，确定要提交吗？</p>
+                
+                <div class="flex space-x-4">
+                    <button id="cancel-submit" 
+                            class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">
+                        取消
+                    </button>
+                    <button id="confirm-submit" 
+                            class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                        确认提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript代码 -->
+    <script src="js/timer.js"></script>
+    <script src="js/test-engine.js"></script>
+    
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查用户信息
+            const userInfo = JSON.parse(localStorage.getItem('amc8_user_info') || '{}');
+            if (!userInfo.name) {
+                alert('请先完成用户信息填写');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 显示学生信息
+            document.getElementById('student-info').textContent = 
+                `${userInfo.name} | ${userInfo.grade}年级`;
+
+            // 初始化测试引擎
+            window.testEngine = new TestEngine();
+            window.testEngine.initialize();
+
+            // 初始化计时器
+            window.timer = new Timer(75 * 60); // 75分钟
+            window.timer.start();
+        });
+
+        // 深色模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        // 检查本地存储的主题设置
+        const currentTheme = localStorage.getItem('theme') || 
+                           (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        if (currentTheme === 'dark') {
+            body.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            
+            if (body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            }
+        });
+
+        // 防止页面刷新时丢失数据
+        window.addEventListener('beforeunload', function(e) {
+            if (window.testEngine) {
+                window.testEngine.saveProgress();
+            }
+        });
+    </script>
+</body>
+</html>
