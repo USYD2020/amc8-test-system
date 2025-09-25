@@ -1,0 +1,21 @@
+{
+  "registeredUsers": [
+    {
+      "phone": "15271226757",
+      "name": "Jeff",
+      "registerTime": "2025-01-08T10:30:00Z",
+      "testCompleted": true,
+      "permission": "vip",
+      "note": "VIP用户，可直接访问所有学习资料"
+    }
+  ],
+  "settings": {
+    "enablePhoneVerification": true,
+    "defaultPermission": "basic",
+    "permissions": {
+      "basic": "基础用户，需加群获取资料",
+      "premium": "高级用户，可直接下载部分资料", 
+      "vip": "VIP用户，可直接下载所有资料"
+    }
+  }
+}

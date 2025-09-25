@@ -1,0 +1,8 @@
+{
+  "name": "AMC8测试系统",
+  "description": "魔渊国际教育AMC8班前测试系统",
+  "framework": "static",
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "installCommand": ""
+}
