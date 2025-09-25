@@ -960,12 +960,19 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         
-        /* 个人微信二维码添加白色背景 */
+        /* 个人微信二维码添加白色背景 - 全面覆盖所有模态框 */
         .modal-dual-images img[alt*="个人微信"],
-        .modal-dual-images img[alt*="老师微信"],
-        img[alt*="老师微信二维码"] {
-            background-color: white;
+        .modal-dual-images img[alt*="老师微信"], 
+        .modal-dual-images img[alt*="微信"],
+        img[alt*="老师微信二维码"],
+        img[alt*="个人微信二维码"],
+        img[alt*="微信二维码"],
+        .modal-body img[alt*="微信"],
+        #study-group-modal img[alt*="个人微信"],
+        #study-group-modal img[alt*="微信二维码"] {
+            background-color: white !important;
             padding: 8px;
+            border-radius: 8px;
         }
 
         .modal-image-label {
