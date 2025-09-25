@@ -202,6 +202,9 @@ class ScoringEngine {
             const userAnswer = userAnswers[questionId];
             const correctAnswer = this.answerKey[questionId];
             const isCorrect = userAnswer === correctAnswer;
+            
+            // 调试日志
+            console.log(`Question ${questionId}: User=${userAnswer}, Correct=${correctAnswer}, IsCorrect=${isCorrect}`);
 
             // 详细结果
             const questionResult = {

@@ -959,6 +959,14 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+        
+        /* 个人微信二维码添加白色背景 */
+        .modal-dual-images img[alt*="个人微信"],
+        .modal-dual-images img[alt*="老师微信"],
+        img[alt*="老师微信二维码"] {
+            background-color: white;
+            padding: 8px;
+        }
 
         .modal-image-label {
             text-align: center;
@@ -1379,11 +1387,11 @@
                     <div class="resources-preview-container mb-6">
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="resource-preview-item">
-                                <img src="images/resource-preview-1.jpg" alt="Aops教材预览" class="w-full h-32 object-cover rounded-lg shadow-md">
+                                <img src="assets/images/resource-preview-1.jpg" alt="Aops教材预览" class="w-full h-32 object-cover rounded-lg shadow-md">
                                 <p class="text-xs text-gray-500 text-center mt-1">Aops竞赛教材</p>
                             </div>
                             <div class="resource-preview-item">
-                                <img src="images/resource-preview-2.jpg" alt="AMC真题库预览" class="w-full h-32 object-cover rounded-lg shadow-md">
+                                <img src="assets/images/resource-preview-2.jpg" alt="AMC真题库预览" class="w-full h-32 object-cover rounded-lg shadow-md">
                                 <p class="text-xs text-gray-500 text-center mt-1">AMC历年真题</p>
                             </div>
                         </div>
@@ -1425,11 +1433,11 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div class="text-center">
-                                    <img src="images/个人微信.jpg" alt="老师微信二维码" class="w-32 h-32 mx-auto rounded-lg shadow-md mb-2">
+                                    <img src="assets/images/个人微信.jpg" alt="老师微信二维码" class="w-32 h-32 mx-auto rounded-lg shadow-md mb-2">
                                     <p class="text-xs text-gray-500">添加老师微信</p>
                                 </div>
                                 <div class="text-center">
-                                    <img src="images/AMC8-MY强化班介绍.png" alt="课程群二维码" class="w-32 h-32 mx-auto rounded-lg shadow-md mb-2">
+                                    <img src="assets/images/AMC8-MY强化班介绍.png" alt="课程群二维码" class="w-32 h-32 mx-auto rounded-lg shadow-md mb-2">
                                     <p class="text-xs text-gray-500">了解课程详情</p>
                                 </div>
                             </div>
@@ -1467,11 +1475,11 @@
                     <div class="resources-preview-container mb-6">
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="resource-preview-item">
-                                <img src="images/resource-preview-3.jpg" alt="解析答案预览" class="w-full h-48 object-cover rounded-lg shadow-md">
+                                <img src="assets/images/resource-preview-3.jpg" alt="解析答案预览" class="w-full h-48 object-cover rounded-lg shadow-md">
                                 <p class="text-xs text-gray-500 text-center mt-1">详细解析答案</p>
                             </div>
                             <div class="resource-preview-item">
-                                <img src="images/resource-preview-4.jpg" alt="练习题集预览" class="w-full h-48 object-cover rounded-lg shadow-md">
+                                <img src="assets/images/resource-preview-4.jpg" alt="练习题集预览" class="w-full h-48 object-cover rounded-lg shadow-md">
                                 <p class="text-xs text-gray-500 text-center mt-1">专项练习题集</p>
                             </div>
                         </div>
@@ -1520,11 +1528,11 @@
                 
                 <div class="modal-dual-images">
                     <div>
-                        <img src="images/AMC8-MY强化班介绍.png" alt="AMC8强化班介绍">
+                        <img src="assets/images/AMC8-MY强化班介绍.png" alt="AMC8强化班介绍">
                         <div class="modal-image-label">课程介绍</div>
                     </div>
                     <div>
-                        <img src="images/个人微信.jpg" alt="个人微信二维码">
+                        <img src="assets/images/个人微信.jpg" alt="个人微信二维码">
                         <div class="modal-image-label">添加老师微信</div>
                     </div>
                 </div>
@@ -1540,9 +1548,9 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="js/test-engine.js"></script>
-    <script src="js/scoring-engine.js"></script>
-    <script src="js/result-display.js"></script>
+    <script src="assets/js/test-engine.js"></script>
+    <script src="assets/js/scoring-engine.js"></script>
+    <script src="assets/js/result-display.js"></script>
     
     <script>
         // 图片路径环境检测和自动适配
@@ -1553,19 +1561,19 @@
                               !window.location.hostname.includes('file://') &&
                               window.location.protocol !== 'file:';
             
-            return isDeployed ? 'images/' : 'images/';
+            return isDeployed ? 'images/' : 'assets/images/';
         }
 
         // 动态更新图片路径
         function updateImagePaths() {
             const imagePath = getImagePath();
-            const images = document.querySelectorAll('img[src*="images/"], img[src*="images/"]');
+            const images = document.querySelectorAll('img[src*="assets/images/"], img[src*="images/"]');
             
             images.forEach(img => {
                 const srcParts = img.src.split('/');
                 const filename = srcParts[srcParts.length - 1];
                 // 只更新包含我们目标路径的图片
-                if (img.src.includes('images/') || img.src.includes('images/')) {
+                if (img.src.includes('assets/images/') || img.src.includes('images/')) {
                     img.src = imagePath + filename;
                 }
             });
